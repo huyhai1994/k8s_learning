@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-deploy # deployment name. Must be valid DNS name
+spec:
+  replicas: 10 # Number of Pods to deploy and manage
+  selector:
+    matchLabels:
+      app: hello-world-update
+  revisionHistoryLimit: 5 # How many older versions/ReplicaSets to keep.  something goes wrong—like a new version causing crashes or errors—you can roll back to a previous working version of your Deployment using Kubernetes' built-in rollback feature.
+  progressDeadlineSeconds: 300
+  minReadySeconds: 10
+  strategy: # This block controls how updates happen
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template: # Below here is the PodTemplate
+    metadata:
+      labels:
+        app: hello-world-update
+    spec:
+      containers:
+        - name: hello-pod
+          image: nigelpoulton/k8sbook:1.0
+          ports:
+            - containerPort: 8080
